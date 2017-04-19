@@ -1,26 +1,15 @@
+import com.sun.media.sound.InvalidFormatException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class Referee extends MultiReferee {
+class Referee {
     private static final int LEAGUE_LEVEL = 3;
 
     private static final int MAP_WIDTH = 23;
@@ -50,38 +39,38 @@ class Referee extends MultiReferee {
 
     static {
         switch (LEAGUE_LEVEL) {
-        case 0: // 1 ship / no mines / speed 1
-            MAX_SHIPS = 1;
-            CANNONS_ENABLED = false;
-            MINES_ENABLED = false;
-            MIN_MINES = 0;
-            MAX_MINES = 0;
-            MAX_SHIP_SPEED = 1;
-            break;
-        case 1: // add mines
-            MAX_SHIPS = 1;
-            CANNONS_ENABLED = true;
-            MINES_ENABLED = true;
-            MIN_MINES = 5;
-            MAX_MINES = 10;
-            MAX_SHIP_SPEED = 1;
-            break;
-        case 2: // 3 ships max
-            MAX_SHIPS = 3;
-            CANNONS_ENABLED = true;
-            MINES_ENABLED = true;
-            MIN_MINES = 5;
-            MAX_MINES = 10;
-            MAX_SHIP_SPEED = 1;
-            break;
-        default: // increase max speed
-            MAX_SHIPS = 3;
-            CANNONS_ENABLED = true;
-            MINES_ENABLED = true;
-            MIN_MINES = 5;
-            MAX_MINES = 10;
-            MAX_SHIP_SPEED = 2;
-            break;
+            case 0: // 1 ship / no mines / speed 1
+                MAX_SHIPS = 1;
+                CANNONS_ENABLED = false;
+                MINES_ENABLED = false;
+                MIN_MINES = 0;
+                MAX_MINES = 0;
+                MAX_SHIP_SPEED = 1;
+                break;
+            case 1: // add mines
+                MAX_SHIPS = 1;
+                CANNONS_ENABLED = true;
+                MINES_ENABLED = true;
+                MIN_MINES = 5;
+                MAX_MINES = 10;
+                MAX_SHIP_SPEED = 1;
+                break;
+            case 2: // 3 ships max
+                MAX_SHIPS = 3;
+                CANNONS_ENABLED = true;
+                MINES_ENABLED = true;
+                MIN_MINES = 5;
+                MAX_MINES = 10;
+                MAX_SHIP_SPEED = 1;
+                break;
+            default: // increase max speed
+                MAX_SHIPS = 3;
+                CANNONS_ENABLED = true;
+                MINES_ENABLED = true;
+                MIN_MINES = 5;
+                MAX_MINES = 10;
+                MAX_SHIP_SPEED = 2;
+                break;
         }
     }
 
@@ -115,8 +104,8 @@ class Referee extends MultiReferee {
     }
 
     public static class Coord {
-        private final static int[][] DIRECTIONS_EVEN = new int[][] { { 1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, 1 } };
-        private final static int[][] DIRECTIONS_ODD = new int[][] { { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, 0 }, { 0, 1 }, { 1, 1 } };
+        private final static int[][] DIRECTIONS_EVEN = new int[][]{{1, 0}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}};
+        private final static int[][] DIRECTIONS_ODD = new int[][]{{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {0, 1}, {1, 1}};
         private final int x;
         private final int y;
 
@@ -170,7 +159,7 @@ class Referee extends MultiReferee {
             return this.toCubeCoordinate().distanceTo(dst.toCubeCoordinate());
         }
 
-        @Override
+
         public boolean equals(Object obj) {
             if (obj == null || getClass() != obj.getClass()) {
                 return false;
@@ -179,14 +168,14 @@ class Referee extends MultiReferee {
             return y == other.y && x == other.x;
         }
 
-        @Override
+
         public String toString() {
             return join(x, y);
         }
     }
 
     public static class CubeCoordinate {
-        static int[][] directions = new int[][] { { 1, -1, 0 }, { +1, 0, -1 }, { 0, +1, -1 }, { -1, +1, 0 }, { -1, 0, +1 }, { 0, -1, +1 } };
+        static int[][] directions = new int[][]{{1, -1, 0}, {+1, 0, -1}, {0, +1, -1}, {-1, +1, 0}, {-1, 0, +1}, {0, -1, +1}};
         int x, y, z;
 
         public CubeCoordinate(int x, int y, int z) {
@@ -213,7 +202,7 @@ class Referee extends MultiReferee {
             return (Math.abs(x - dst.x) + Math.abs(y - dst.y) + Math.abs(z - dst.z)) / 2;
         }
 
-        @Override
+
         public String toString() {
             return join(x, y, z);
         }
@@ -409,102 +398,102 @@ class Referee extends MultiReferee {
             double targetAngle, angleStraight, anglePort, angleStarboard, centerAngle, anglePortCenter, angleStarboardCenter;
 
             switch (speed) {
-            case 2:
-                this.action = Action.SLOWER;
-                break;
-            case 1:
-                // Suppose we've moved first
-                currentPosition = currentPosition.neighbor(orientation);
-                if (!currentPosition.isInsideMap()) {
+                case 2:
                     this.action = Action.SLOWER;
                     break;
-                }
+                case 1:
+                    // Suppose we've moved first
+                    currentPosition = currentPosition.neighbor(orientation);
+                    if (!currentPosition.isInsideMap()) {
+                        this.action = Action.SLOWER;
+                        break;
+                    }
 
-                // Target reached at next turn
-                if (currentPosition.equals(targetPosition)) {
-                    this.action = null;
+                    // Target reached at next turn
+                    if (currentPosition.equals(targetPosition)) {
+                        this.action = null;
+                        break;
+                    }
+
+                    // For each neighbor cell, find the closest to target
+                    targetAngle = currentPosition.angle(targetPosition);
+                    angleStraight = Math.min(Math.abs(orientation - targetAngle), 6 - Math.abs(orientation - targetAngle));
+                    anglePort = Math.min(Math.abs((orientation + 1) - targetAngle), Math.abs((orientation - 5) - targetAngle));
+                    angleStarboard = Math.min(Math.abs((orientation + 5) - targetAngle), Math.abs((orientation - 1) - targetAngle));
+
+                    centerAngle = currentPosition.angle(new Coord(MAP_WIDTH / 2, MAP_HEIGHT / 2));
+                    anglePortCenter = Math.min(Math.abs((orientation + 1) - centerAngle), Math.abs((orientation - 5) - centerAngle));
+                    angleStarboardCenter = Math.min(Math.abs((orientation + 5) - centerAngle), Math.abs((orientation - 1) - centerAngle));
+
+                    // Next to target with bad angle, slow down then rotate (avoid to turn around the target!)
+                    if (currentPosition.distanceTo(targetPosition) == 1 && angleStraight > 1.5) {
+                        this.action = Action.SLOWER;
+                        break;
+                    }
+
+                    Integer distanceMin = null;
+
+                    // Test forward
+                    Coord nextPosition = currentPosition.neighbor(orientation);
+                    if (nextPosition.isInsideMap()) {
+                        distanceMin = nextPosition.distanceTo(targetPosition);
+                        this.action = null;
+                    }
+
+                    // Test port
+                    nextPosition = currentPosition.neighbor((orientation + 1) % 6);
+                    if (nextPosition.isInsideMap()) {
+                        int distance = nextPosition.distanceTo(targetPosition);
+                        if (distanceMin == null || distance < distanceMin || distance == distanceMin && anglePort < angleStraight - 0.5) {
+                            distanceMin = distance;
+                            this.action = Action.PORT;
+                        }
+                    }
+
+                    // Test starboard
+                    nextPosition = currentPosition.neighbor((orientation + 5) % 6);
+                    if (nextPosition.isInsideMap()) {
+                        int distance = nextPosition.distanceTo(targetPosition);
+                        if (distanceMin == null || distance < distanceMin
+                                || (distance == distanceMin && angleStarboard < anglePort - 0.5 && this.action == Action.PORT)
+                                || (distance == distanceMin && angleStarboard < angleStraight - 0.5 && this.action == null)
+                                || (distance == distanceMin && this.action == Action.PORT && angleStarboard == anglePort
+                                && angleStarboardCenter < anglePortCenter)
+                                || (distance == distanceMin && this.action == Action.PORT && angleStarboard == anglePort
+                                && angleStarboardCenter == anglePortCenter && (orientation == 1 || orientation == 4))) {
+                            distanceMin = distance;
+                            this.action = Action.STARBOARD;
+                        }
+                    }
                     break;
-                }
+                case 0:
+                    // Rotate ship towards target
+                    targetAngle = currentPosition.angle(targetPosition);
+                    angleStraight = Math.min(Math.abs(orientation - targetAngle), 6 - Math.abs(orientation - targetAngle));
+                    anglePort = Math.min(Math.abs((orientation + 1) - targetAngle), Math.abs((orientation - 5) - targetAngle));
+                    angleStarboard = Math.min(Math.abs((orientation + 5) - targetAngle), Math.abs((orientation - 1) - targetAngle));
 
-                // For each neighbor cell, find the closest to target
-                targetAngle = currentPosition.angle(targetPosition);
-                angleStraight = Math.min(Math.abs(orientation - targetAngle), 6 - Math.abs(orientation - targetAngle));
-                anglePort = Math.min(Math.abs((orientation + 1) - targetAngle), Math.abs((orientation - 5) - targetAngle));
-                angleStarboard = Math.min(Math.abs((orientation + 5) - targetAngle), Math.abs((orientation - 1) - targetAngle));
+                    centerAngle = currentPosition.angle(new Coord(MAP_WIDTH / 2, MAP_HEIGHT / 2));
+                    anglePortCenter = Math.min(Math.abs((orientation + 1) - centerAngle), Math.abs((orientation - 5) - centerAngle));
+                    angleStarboardCenter = Math.min(Math.abs((orientation + 5) - centerAngle), Math.abs((orientation - 1) - centerAngle));
 
-                centerAngle = currentPosition.angle(new Coord(MAP_WIDTH / 2, MAP_HEIGHT / 2));
-                anglePortCenter = Math.min(Math.abs((orientation + 1) - centerAngle), Math.abs((orientation - 5) - centerAngle));
-                angleStarboardCenter = Math.min(Math.abs((orientation + 5) - centerAngle), Math.abs((orientation - 1) - centerAngle));
+                    Coord forwardPosition = currentPosition.neighbor(orientation);
 
-                // Next to target with bad angle, slow down then rotate (avoid to turn around the target!)
-                if (currentPosition.distanceTo(targetPosition) == 1 && angleStraight > 1.5) {
-                    this.action = Action.SLOWER;
-                    break;
-                }
-
-                Integer distanceMin = null;
-
-                // Test forward
-                Coord nextPosition = currentPosition.neighbor(orientation);
-                if (nextPosition.isInsideMap()) {
-                    distanceMin = nextPosition.distanceTo(targetPosition);
                     this.action = null;
-                }
 
-                // Test port
-                nextPosition = currentPosition.neighbor((orientation + 1) % 6);
-                if (nextPosition.isInsideMap()) {
-                    int distance = nextPosition.distanceTo(targetPosition);
-                    if (distanceMin == null || distance < distanceMin || distance == distanceMin && anglePort < angleStraight - 0.5) {
-                        distanceMin = distance;
+                    if (anglePort <= angleStarboard) {
                         this.action = Action.PORT;
                     }
-                }
 
-                // Test starboard
-                nextPosition = currentPosition.neighbor((orientation + 5) % 6);
-                if (nextPosition.isInsideMap()) {
-                    int distance = nextPosition.distanceTo(targetPosition);
-                    if (distanceMin == null || distance < distanceMin
-                            || (distance == distanceMin && angleStarboard < anglePort - 0.5 && this.action == Action.PORT)
-                            || (distance == distanceMin && angleStarboard < angleStraight - 0.5 && this.action == null)
-                            || (distance == distanceMin && this.action == Action.PORT && angleStarboard == anglePort
-                                    && angleStarboardCenter < anglePortCenter)
-                            || (distance == distanceMin && this.action == Action.PORT && angleStarboard == anglePort
-                                    && angleStarboardCenter == anglePortCenter && (orientation == 1 || orientation == 4))) {
-                        distanceMin = distance;
+                    if (angleStarboard < anglePort || angleStarboard == anglePort && angleStarboardCenter < anglePortCenter
+                            || angleStarboard == anglePort && angleStarboardCenter == anglePortCenter && (orientation == 1 || orientation == 4)) {
                         this.action = Action.STARBOARD;
                     }
-                }
-                break;
-            case 0:
-                // Rotate ship towards target
-                targetAngle = currentPosition.angle(targetPosition);
-                angleStraight = Math.min(Math.abs(orientation - targetAngle), 6 - Math.abs(orientation - targetAngle));
-                anglePort = Math.min(Math.abs((orientation + 1) - targetAngle), Math.abs((orientation - 5) - targetAngle));
-                angleStarboard = Math.min(Math.abs((orientation + 5) - targetAngle), Math.abs((orientation - 1) - targetAngle));
 
-                centerAngle = currentPosition.angle(new Coord(MAP_WIDTH / 2, MAP_HEIGHT / 2));
-                anglePortCenter = Math.min(Math.abs((orientation + 1) - centerAngle), Math.abs((orientation - 5) - centerAngle));
-                angleStarboardCenter = Math.min(Math.abs((orientation + 5) - centerAngle), Math.abs((orientation - 1) - centerAngle));
-
-                Coord forwardPosition = currentPosition.neighbor(orientation);
-
-                this.action = null;
-
-                if (anglePort <= angleStarboard) {
-                    this.action = Action.PORT;
-                }
-
-                if (angleStarboard < anglePort || angleStarboard == anglePort && angleStarboardCenter < anglePortCenter
-                        || angleStarboard == anglePort && angleStarboardCenter == anglePortCenter && (orientation == 1 || orientation == 4)) {
-                    this.action = Action.STARBOARD;
-                }
-
-                if (forwardPosition.isInsideMap() && angleStraight <= anglePort && angleStraight <= angleStarboard) {
-                    this.action = Action.FASTER;
-                }
-                break;
+                    if (forwardPosition.isInsideMap() && angleStraight <= anglePort && angleStraight <= angleStarboard) {
+                        this.action = Action.FASTER;
+                    }
+                    break;
             }
 
         }
@@ -658,14 +647,97 @@ class Referee extends MultiReferee {
     private Random random;
 
     public Referee(InputStream is, PrintStream out, PrintStream err) throws IOException {
-        super(is, out, err);
+        initReferee(2, new Properties());
+
+        Scanner in = new Scanner(is);
+
+        try {
+            // Read ###Start 2
+            in.nextLine();
+
+            out.println("###Input 0");
+            for (String line : getInitInputForPlayer(0)) {
+                out.println(line);
+            }
+
+            out.println("###Input 1");
+            for (String line : getInitInputForPlayer(1)) {
+                out.println(line);
+            }
+
+            int round = 0;
+
+            while (round < getMaxRoundCount(2)) {
+                out.println("###Input 0");
+                for (String line : getInputForPlayer(round, 0)) {
+                    out.println(line);
+                }
+
+                out.println("###Output 0 1");
+                try {
+                    handlePlayerOutput(0, round, 0, new String[]{in.nextLine()});
+                } catch (LostException e) {
+                    err.println("###Error 0 Lost " + e.getMessage());
+                    players.get(0).setDead();
+                } catch (InvalidInputException e) {
+                    err.println("###Error 0 InvalidInput " + e.getMessage());
+                    players.get(0).setDead();
+                } catch (WinException e) {
+                    err.println("###Error 0 Win " + e.getMessage());
+                }
+
+                out.println("###Input 1");
+                for (String line : getInputForPlayer(round, 1)) {
+                    out.println(line);
+                }
+
+                out.println("###Output 1 1");
+                try {
+                    handlePlayerOutput(0, round, 1, new String[]{in.nextLine()});
+                } catch (LostException e) {
+                    err.println("###Error 1 Lost " + e.getMessage());
+                    players.get(1).setDead();
+                } catch (InvalidInputException e) {
+                    err.println("###Error 1 InvalidInput " + e.getMessage());
+                    players.get(1).setDead();
+                } catch (WinException e) {
+                    err.println("###Error 1 Win " + e.getMessage());
+                }
+
+                try {
+                    updateGame(round);
+                } catch (GameOverException e) {
+                    if (players.get(0).getScore() > players.get(1).getScore()) {
+                        out.println("###End 0 1");
+                    } else if (players.get(0).getScore() < players.get(1).getScore()) {
+                        out.println("###End 1 0");
+                    } else {
+                        out.println("###End 01");
+                    }
+
+                    return;
+                }
+
+                round += 1;
+            }
+
+            if (players.get(0).getScore() > players.get(1).getScore()) {
+                out.println("###End 0 1");
+            } else if (players.get(0).getScore() < players.get(1).getScore()) {
+                out.println("###End 1 0");
+            } else {
+                out.println("###End 01");
+            }
+        } finally {
+            in.close();
+        }
     }
 
     public static void main(String... args) throws IOException {
         new Referee(System.in, System.out, System.err);
     }
 
-    @Override
+
     protected void initReferee(int playerCount, Properties prop) throws InvalidFormatException {
         seed = parseProperty(prop, "seed", new Random(System.currentTimeMillis()).nextLong());
 
@@ -756,7 +828,7 @@ class Referee extends MultiReferee {
 
     }
 
-    @Override
+
     protected Properties getConfiguration() {
         Properties prop = new Properties();
         prop.setProperty("seed", String.valueOf(seed));
@@ -766,7 +838,7 @@ class Referee extends MultiReferee {
         return prop;
     }
 
-    @Override
+
     protected void prepare(int round) {
         for (Player player : players) {
             for (Ship ship : player.ships) {
@@ -778,12 +850,12 @@ class Referee extends MultiReferee {
         damage.clear();
     }
 
-    @Override
+
     protected int getExpectedOutputLineCountForPlayer(int playerIdx) {
         return this.players.get(playerIdx).shipsAlive.size();
     }
 
-    @Override
+
     protected void handlePlayerOutput(int frame, int round, int playerIdx, String[] outputs)
             throws WinException, LostException, InvalidInputException {
         Player player = this.players.get(playerIdx);
@@ -851,7 +923,7 @@ class Referee extends MultiReferee {
     }
 
     private void moveCannonballs() {
-        for (Iterator<Cannonball> it = cannonballs.iterator(); it.hasNext();) {
+        for (Iterator<Cannonball> it = cannonballs.iterator(); it.hasNext(); ) {
             Cannonball ball = it.next();
             if (ball.remainingTurns == 0) {
                 it.remove();
@@ -880,50 +952,50 @@ class Referee extends MultiReferee {
 
                 if (ship.action != null) {
                     switch (ship.action) {
-                    case FASTER:
-                        if (ship.speed < MAX_SHIP_SPEED) {
-                            ship.speed++;
-                        }
-                        break;
-                    case SLOWER:
-                        if (ship.speed > 0) {
-                            ship.speed--;
-                        }
-                        break;
-                    case PORT:
-                        ship.newOrientation = (ship.orientation + 1) % 6;
-                        break;
-                    case STARBOARD:
-                        ship.newOrientation = (ship.orientation + 5) % 6;
-                        break;
-                    case MINE:
-                        if (ship.mineCooldown == 0) {
-                            Coord target = ship.stern().neighbor((ship.orientation + 3) % 6);
-
-                            if (target.isInsideMap()) {
-                                boolean cellIsFreeOfBarrels = barrels.stream().noneMatch(barrel -> barrel.position.equals(target));
-                                boolean cellIsFreeOfMines = mines.stream().noneMatch(mine -> mine.position.equals(target));
-                                boolean cellIsFreeOfShips = ships.stream().filter(b -> b != ship).noneMatch(b -> b.at(target));
-
-                                if (cellIsFreeOfBarrels && cellIsFreeOfShips && cellIsFreeOfMines) {
-                                    ship.mineCooldown = COOLDOWN_MINE;
-                                    Mine mine = new Mine(target.x, target.y);
-                                    mines.add(mine);
-                                }
+                        case FASTER:
+                            if (ship.speed < MAX_SHIP_SPEED) {
+                                ship.speed++;
                             }
+                            break;
+                        case SLOWER:
+                            if (ship.speed > 0) {
+                                ship.speed--;
+                            }
+                            break;
+                        case PORT:
+                            ship.newOrientation = (ship.orientation + 1) % 6;
+                            break;
+                        case STARBOARD:
+                            ship.newOrientation = (ship.orientation + 5) % 6;
+                            break;
+                        case MINE:
+                            if (ship.mineCooldown == 0) {
+                                Coord target = ship.stern().neighbor((ship.orientation + 3) % 6);
 
-                        }
-                        break;
-                    case FIRE:
-                        int distance = ship.bow().distanceTo(ship.target);
-                        if (ship.target.isInsideMap() && distance <= FIRE_DISTANCE_MAX && ship.cannonCooldown == 0) {
-                            int travelTime = (int) (1 + Math.round(ship.bow().distanceTo(ship.target) / 3.0));
-                            cannonballs.add(new Cannonball(ship.target.x, ship.target.y, ship.id, ship.bow().x, ship.bow().y, travelTime));
-                            ship.cannonCooldown = COOLDOWN_CANNON;
-                        }
-                        break;
-                    default:
-                        break;
+                                if (target.isInsideMap()) {
+                                    boolean cellIsFreeOfBarrels = barrels.stream().noneMatch(barrel -> barrel.position.equals(target));
+                                    boolean cellIsFreeOfMines = mines.stream().noneMatch(mine -> mine.position.equals(target));
+                                    boolean cellIsFreeOfShips = ships.stream().filter(b -> b != ship).noneMatch(b -> b.at(target));
+
+                                    if (cellIsFreeOfBarrels && cellIsFreeOfShips && cellIsFreeOfMines) {
+                                        ship.mineCooldown = COOLDOWN_MINE;
+                                        Mine mine = new Mine(target.x, target.y);
+                                        mines.add(mine);
+                                    }
+                                }
+
+                            }
+                            break;
+                        case FIRE:
+                            int distance = ship.bow().distanceTo(ship.target);
+                            if (ship.target.isInsideMap() && distance <= FIRE_DISTANCE_MAX && ship.cannonCooldown == 0) {
+                                int travelTime = (int) (1 + Math.round(ship.bow().distanceTo(ship.target) / 3.0));
+                                cannonballs.add(new Cannonball(ship.target.x, ship.target.y, ship.id, ship.bow().x, ship.bow().y, travelTime));
+                                ship.cannonCooldown = COOLDOWN_CANNON;
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -935,7 +1007,7 @@ class Referee extends MultiReferee {
         Coord stern = ship.stern();
         Coord center = ship.position;
 
-        for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext();) {
+        for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext(); ) {
             RumBarrel barrel = it.next();
             if (barrel.position.equals(bow) || barrel.position.equals(stern) || barrel.position.equals(center)) {
                 ship.heal(barrel.health);
@@ -945,7 +1017,7 @@ class Referee extends MultiReferee {
     }
 
     private void checkMineCollisions() {
-        for (Iterator<Mine> it = mines.iterator(); it.hasNext();) {
+        for (Iterator<Mine> it = mines.iterator(); it.hasNext(); ) {
             Mine mine = it.next();
             List<Damage> mineDamage = mine.explode(ships, false);
 
@@ -1081,7 +1153,7 @@ class Referee extends MultiReferee {
     }
 
     void explodeShips() {
-        for (Iterator<Coord> it = cannonBallExplosions.iterator(); it.hasNext();) {
+        for (Iterator<Coord> it = cannonBallExplosions.iterator(); it.hasNext(); ) {
             Coord position = it.next();
             for (Ship ship : ships) {
                 if (position.equals(ship.bow()) || position.equals(ship.stern())) {
@@ -1100,9 +1172,9 @@ class Referee extends MultiReferee {
     }
 
     void explodeMines() {
-        for (Iterator<Coord> itBall = cannonBallExplosions.iterator(); itBall.hasNext();) {
+        for (Iterator<Coord> itBall = cannonBallExplosions.iterator(); itBall.hasNext(); ) {
             Coord position = itBall.next();
-            for (Iterator<Mine> it = mines.iterator(); it.hasNext();) {
+            for (Iterator<Mine> it = mines.iterator(); it.hasNext(); ) {
                 Mine mine = it.next();
                 if (mine.position.equals(position)) {
                     damage.addAll(mine.explode(ships, true));
@@ -1115,9 +1187,9 @@ class Referee extends MultiReferee {
     }
 
     void explodeBarrels() {
-        for (Iterator<Coord> itBall = cannonBallExplosions.iterator(); itBall.hasNext();) {
+        for (Iterator<Coord> itBall = cannonBallExplosions.iterator(); itBall.hasNext(); ) {
             Coord position = itBall.next();
-            for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext();) {
+            for (Iterator<RumBarrel> it = barrels.iterator(); it.hasNext(); ) {
                 RumBarrel barrel = it.next();
                 if (barrel.position.equals(position)) {
                     damage.add(new Damage(position, 0, true));
@@ -1129,7 +1201,7 @@ class Referee extends MultiReferee {
         }
     }
 
-    @Override
+
     protected void updateGame(int round) throws GameOverException {
         moveCannonballs();
         decrementRum();
@@ -1157,7 +1229,7 @@ class Referee extends MultiReferee {
             damage.add(new Damage(position, 0, false));
         }
 
-        for (Iterator<Ship> it = ships.iterator(); it.hasNext();) {
+        for (Iterator<Ship> it = ships.iterator(); it.hasNext(); ) {
             Ship ship = it.next();
             if (ship.health <= 0) {
                 players.get(ship.owner).shipsAlive.remove(ship);
@@ -1170,17 +1242,17 @@ class Referee extends MultiReferee {
         }
     }
 
-    @Override
+
     protected void populateMessages(Properties p) {
         p.put("endReached", "End reached");
     }
 
-    @Override
+
     protected String[] getInitInputForPlayer(int playerIdx) {
         return new String[0];
     }
 
-    @Override
+
     protected String[] getInputForPlayer(int round, int playerIdx) {
         List<String> data = new ArrayList<>();
 
@@ -1224,7 +1296,7 @@ class Referee extends MultiReferee {
         return data.toArray(new String[data.size()]);
     }
 
-    @Override
+
     protected String[] getInitDataForView() {
         List<String> data = new ArrayList<>();
 
@@ -1235,7 +1307,7 @@ class Referee extends MultiReferee {
         return data.toArray(new String[data.size()]);
     }
 
-    @Override
+
     protected String[] getFrameDataForView(int round, int frame, boolean keyFrame) {
         List<String> data = new ArrayList<>();
 
@@ -1262,62 +1334,62 @@ class Referee extends MultiReferee {
         return data.toArray(new String[data.size()]);
     }
 
-    @Override
+
     protected String getGameName() {
         return "CodersOfTheCaribbean";
     }
 
-    @Override
+
     protected String getHeadlineAtGameStartForConsole() {
         return null;
     }
 
-    @Override
+
     protected int getMinimumPlayerCount() {
         return 2;
     }
 
-    @Override
+
     protected boolean showTooltips() {
         return true;
     }
 
-    @Override
+
     protected String[] getPlayerActions(int playerIdx, int round) {
         return new String[0];
     }
 
-    @Override
+
     protected boolean isPlayerDead(int playerIdx) {
         return false;
     }
 
-    @Override
+
     protected String getDeathReason(int playerIdx) {
         return "$" + playerIdx + ": Eliminated!";
     }
 
-    @Override
+
     protected int getScore(int playerIdx) {
         return players.get(playerIdx).getScore();
     }
 
-    @Override
+
     protected String[] getGameSummary(int round) {
         return new String[0];
     }
 
-    @Override
+
     protected void setPlayerTimeout(int frame, int round, int playerIdx) {
         players.get(playerIdx).setDead();
     }
 
-    @Override
+
     protected int getMaxRoundCount(int playerCount) {
         return 200;
     }
 
-    @Override
+
     protected int getMillisTimeForRound() {
         return 50;
     }
