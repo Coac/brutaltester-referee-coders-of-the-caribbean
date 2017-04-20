@@ -673,9 +673,10 @@ class Referee {
                     out.println(line);
                 }
 
-                out.println("###Output 0 1");
+                int player0OutputCount = getExpectedOutputLineCountForPlayer(0);
+                out.println("###Output 0 " + player0OutputCount);
                 try {
-                    handlePlayerOutput(0, round, 0, new String[]{in.nextLine()});
+                    handlePlayerOutput(0, round, 0, getOutputs(in, player0OutputCount));
                 } catch (LostException e) {
                     err.println("###Error 0 Lost " + e.getMessage());
                     players.get(0).setDead();
@@ -691,9 +692,10 @@ class Referee {
                     out.println(line);
                 }
 
-                out.println("###Output 1 1");
+                int player1OutputCount = getExpectedOutputLineCountForPlayer(1);
+                out.println("###Output 1 " + player1OutputCount);
                 try {
-                    handlePlayerOutput(0, round, 1, new String[]{in.nextLine()});
+                    handlePlayerOutput(0, round, 1, getOutputs(in, player1OutputCount));
                 } catch (LostException e) {
                     err.println("###Error 1 Lost " + e.getMessage());
                     players.get(1).setDead();
@@ -853,6 +855,14 @@ class Referee {
 
     protected int getExpectedOutputLineCountForPlayer(int playerIdx) {
         return this.players.get(playerIdx).shipsAlive.size();
+    }
+
+    String[] getOutputs(Scanner in, int outputCount) {
+        String[] outputs = new String[outputCount];
+        for (int i = 0; i < outputCount; i++) {
+            outputs[i] = in.nextLine();
+        }
+        return outputs;
     }
 
 
