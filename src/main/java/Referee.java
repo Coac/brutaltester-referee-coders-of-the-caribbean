@@ -668,6 +668,7 @@ class Referee {
             int round = 0;
 
             while (round < getMaxRoundCount(2)) {
+                prepare(round);
                 out.println("###Input 0");
                 for (String line : getInputForPlayer(round, 0)) {
                     out.println(line);
